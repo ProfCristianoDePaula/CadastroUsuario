@@ -129,7 +129,7 @@ namespace CadastroUsuario.Areas.Identity.Pages.Account
                     // Obter o Id do Usuario
                     var userId = await _signInManager.UserManager.GetUserIdAsync(user);
                     // Verificar se o usuario completou o cadastro
-                    var usuario = await _context.Usuarios.FindAsync(Guid.Parse(userId));
+                    var usuario = _context.Usuarios.FirstOrDefault(u => u.AppUserId == Guid.Parse(userId));
 
                     // Se o usuario nao completou o cadastro, redireciona para a pagina de cadastro Usuarios/Create
                     if (usuario == null)

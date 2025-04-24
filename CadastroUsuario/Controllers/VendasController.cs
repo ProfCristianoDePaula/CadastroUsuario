@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace CadastroUsuario.Controllers
 {
-    [Authorize(Roles = "VENDEDOR")]
+
     public class VendasController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -23,6 +23,7 @@ namespace CadastroUsuario.Controllers
 
         // GET: Vendas
 
+        [Authorize(Roles = "Vendedor")]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Vendas.ToListAsync());

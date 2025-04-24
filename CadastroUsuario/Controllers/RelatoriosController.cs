@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace CadastroUsuario.Controllers
 {
 
-    [Authorize(Roles = "Gerente")]
+
     public class RelatoriosController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -22,6 +22,7 @@ namespace CadastroUsuario.Controllers
             _context = context;
         }
 
+        [Authorize(Roles = "Gerente")]
         // GET: Relatorios
         public async Task<IActionResult> Index()
         {

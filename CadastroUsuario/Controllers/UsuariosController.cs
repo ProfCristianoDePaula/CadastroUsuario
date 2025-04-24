@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using CadastroUsuario.Data;
 using CadastroUsuario.Models;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
 
 namespace CadastroUsuario.Controllers
 {
@@ -55,7 +56,7 @@ namespace CadastroUsuario.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("UsuarioId,NomeCompleto,Celular,CPF,AppUserId")] Usuario usuario)
+        public async Task<IActionResult> Create([Bind("UsuarioId,NomeCompleto,Celular,CPF,AppUserId,TipoUsuario")] Usuario usuario)
         {
             if (ModelState.IsValid)
             {
@@ -87,6 +88,16 @@ namespace CadastroUsuario.Controllers
                 usuario.UsuarioId = Guid.NewGuid();
                 _context.Add(usuario);
                 await _context.SaveChangesAsync();
+
+                // Criar um registro no AspNetUsersRoles com o Tipo de Usuário
+                var role = new IdentityUserRole<string>
+                {
+                    UserId = usuario.AppUserId.ToString(),
+                    RoleId = _context.Roles.FirstOrDefault(r => r.Name == usuario.TipoUsuario).Id // Defina o ID do papel desejado aqui
+                };
+                _context.UserRoles.Add(role);
+                await _context.SaveChangesAsync();
+
                 return RedirectToAction("Index", "Home");
             }
             return View(usuario);
@@ -113,7 +124,7 @@ namespace CadastroUsuario.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("UsuarioId,NomeCompleto,Celular,CPF,AppUserId")] Usuario usuario)
+        public async Task<IActionResult> Edit(Guid id, [Bind("UsuarioId,NomeCompleto,Celular,CPF,AppUserId,TipoUsuario")] Usuario usuario)
         {
             if (id != usuario.UsuarioId)
             {

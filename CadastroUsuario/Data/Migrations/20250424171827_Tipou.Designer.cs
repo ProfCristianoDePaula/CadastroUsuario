@@ -4,6 +4,7 @@ using CadastroUsuario.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CadastroUsuario.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250424171827_Tipou")]
+    partial class Tipou
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -86,19 +89,19 @@ namespace CadastroUsuario.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "79a97722-087f-4f76-96f1-8c47319f04fc",
+                            Id = "beb1f03f-1d2b-4105-8e14-40e667c299b2",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "b67fcba3-7de4-4d7f-926b-5296015f9452",
+                            Id = "e1a37a3f-2a3e-4efb-8caa-0216a7ac23cc",
                             Name = "Vendedor",
                             NormalizedName = "VENDEDOR"
                         },
                         new
                         {
-                            Id = "e3ed03f8-e6dd-4907-b2af-81675e9ca79b",
+                            Id = "2ec6e250-f7a6-49fe-b21e-015675db1688",
                             Name = "Gerente",
                             NormalizedName = "GERENTE"
                         });

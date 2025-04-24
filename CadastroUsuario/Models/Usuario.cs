@@ -8,6 +8,7 @@ namespace CadastroUsuario.Models
         public string NomeCompleto { get; set; }
         public string Celular { get; set; }
         public string CPF { get; set; }
+        public string TipoUsuario { get; set; }
         public Guid? AppUserId { get; set; }
         public IdentityUser? IdentityUser { get; set; }
     }

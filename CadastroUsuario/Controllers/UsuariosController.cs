@@ -87,13 +87,13 @@ namespace CadastroUsuario.Controllers
 
                 usuario.UsuarioId = Guid.NewGuid();
                 _context.Add(usuario);
-                await _context.SaveChangesAsync();
+
 
                 // Criar um registro no AspNetUsersRoles com o Tipo de Usuário
                 var role = new IdentityUserRole<string>
                 {
-                    UserId = usuario.AppUserId.ToString(),
-                    RoleId = _context.Roles.FirstOrDefault(r => r.Name == usuario.TipoUsuario).Id // Defina o ID do papel desejado aqui
+                    UserId = userId,
+                    RoleId = _context.Roles.Where(r => r.Name == usuario.TipoUsuario).First().Id // Defina o ID do papel desejado aqui
                 };
                 _context.UserRoles.Add(role);
                 await _context.SaveChangesAsync();

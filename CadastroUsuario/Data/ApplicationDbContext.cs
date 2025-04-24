@@ -13,12 +13,16 @@ namespace CadastroUsuario.Data
         }
 
         public DbSet<Usuario> Usuarios { get; set; }
+        public DbSet<Venda> Vendas { get; set; }
+        public DbSet<Relatorio> Relatorios { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
             // Configurações adicionais para o modelo, se necessário
             modelBuilder.Entity<Usuario>().ToTable("Usuarios");
+            modelBuilder.Entity<Venda>().ToTable("Vendas");
+            modelBuilder.Entity<Relatorio>().ToTable("Relatorios");
 
             // Cadastrando as Roles padrão do Sistema 
             Guid AdminGuid = Guid.NewGuid();

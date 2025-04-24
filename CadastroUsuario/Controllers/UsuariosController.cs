@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CadastroUsuario.Data;
 using CadastroUsuario.Models;
+using System.Security.Claims;
 
 namespace CadastroUsuario.Controllers
 {
@@ -58,10 +59,35 @@ namespace CadastroUsuario.Controllers
         {
             if (ModelState.IsValid)
             {
+                // Setar o AppUserId com o Id do Usuario do Identity
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (userId == null)
+                {
+                    ModelState.AddModelError("", "Usuário não autenticado.");
+                    return View(usuario);
+                }
+
+                // Verifica se o usuário já existe
+                var usuarioExistente = await _context.Usuarios
+                    .FirstOrDefaultAsync(u => u.AppUserId == Guid.Parse(userId));
+
+                if (usuarioExistente != null)
+                {
+                    ModelState.AddModelError("", "Usuário já cadastrado.");
+                    return View(usuario);
+                }
+
+                // Definir o AppUserId com o Id do usuario autenticado
+                usuario.AppUserId = Guid.Parse(userId);
+
+                // Fazer o vinculo do IdentityUser com o Usuario
+                var identityUser = await _context.Users.FindAsync(userId);
+                usuario.IdentityUser = identityUser;
+
                 usuario.UsuarioId = Guid.NewGuid();
                 _context.Add(usuario);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index", "Home");
             }
             return View(usuario);
         }

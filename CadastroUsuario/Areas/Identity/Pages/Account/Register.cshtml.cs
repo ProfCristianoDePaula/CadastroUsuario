@@ -74,19 +74,19 @@ namespace CadastroUsuario.Areas.Identity.Pages.Account
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
-            [Required]
-            [EmailAddress]
-            [Display(Name = "Email")]
+            [Required(ErrorMessage = "O E-mail é Obrigatório.")]
+            [EmailAddress(ErrorMessage = "Formato do E-mail Incorreto.")]
+            [Display(Name = "E-mail")]
             public string Email { get; set; }
 
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
-            [Required]
-            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
-            [DataType(DataType.Password)]
-            [Display(Name = "Password")]
+            [Required(ErrorMessage = "O Senha é Obrigatório.")]
+            [StringLength(100, ErrorMessage = "A Senha Deve Conter de 6 até 100 Caracteres.", MinimumLength = 6)]
+            [DataType(DataType.Password, ErrorMessage = "Formato da Senha Incorreta.")]
+            [Display(Name = "Senha")]
             public string Password { get; set; }
 
             /// <summary>
@@ -94,8 +94,8 @@ namespace CadastroUsuario.Areas.Identity.Pages.Account
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
             [DataType(DataType.Password)]
-            [Display(Name = "Confirm password")]
-            [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+            [Display(Name = "Confirme a Senha")]
+            [Compare("Password", ErrorMessage = "A Senha e a Confirmação da Senha Não São Identicos.")]
             public string ConfirmPassword { get; set; }
         }
 
@@ -108,7 +108,7 @@ namespace CadastroUsuario.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
-            returnUrl ??= Url.Content("~/");
+            returnUrl ??= Url.Content("~/Usuarios/Create");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {

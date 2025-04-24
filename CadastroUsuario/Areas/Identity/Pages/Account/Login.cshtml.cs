@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using CadastroUsuario.Data;
 
 namespace CadastroUsuario.Areas.Identity.Pages.Account
 {
@@ -21,11 +22,13 @@ namespace CadastroUsuario.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
+        private readonly ApplicationDbContext _context; // Injeção do Contexto do Banco de Dados
 
-        public LoginModel(SignInManager<IdentityUser> signInManager, ILogger<LoginModel> logger)
+        public LoginModel(SignInManager<IdentityUser> signInManager, ILogger<LoginModel> logger, ApplicationDbContext context)
         {
             _signInManager = signInManager;
             _logger = logger;
+            _context = context;
         }
 
         /// <summary>
@@ -114,6 +117,24 @@ namespace CadastroUsuario.Areas.Identity.Pages.Account
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
+                    // Obter o Usuario que esta logado
+                    var user = await _signInManager.UserManager.FindByEmailAsync(Input.Email);
+                    if (user == null)
+                    {
+                        ModelState.AddModelError(string.Empty, "Usuário Não Cadastrado");
+                        return Page();
+                    }
+                    // Obter o Id do Usuario
+                    var userId = await _signInManager.UserManager.GetUserIdAsync(user);
+                    // Verificar se o usuario completou o cadastro
+                    var usuario = await _context.Usuarios.FindAsync(Guid.Parse(userId));
+
+                    // Se o usuario nao completou o cadastro, redireciona para a pagina de cadastro Usuarios/Create
+                    if (usuario == null)
+                    {
+                        return LocalRedirect("~/Usuarios/Create");
+                    }
+
                     _logger.LogInformation("User logged in.");
                     return LocalRedirect(returnUrl);
                 }

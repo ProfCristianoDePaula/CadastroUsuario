@@ -15,16 +15,37 @@ namespace CadastroUsuario.Controllers
     public class UsuariosController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<IdentityUser> _signInManager;
 
-        public UsuariosController(ApplicationDbContext context)
+        public UsuariosController(ApplicationDbContext context, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
         {
             _context = context;
+            _userManager = userManager;
+            _signInManager = signInManager;
         }
 
         // GET: Usuarios
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Usuarios.ToListAsync());
+            // Verificar o usuario que esta autenticado
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                ModelState.AddModelError("Loggin", "Usuário não autenticado.");
+                return RedirectToAction("Index", "Home");
+            }
+
+            // Filtar os usuarios que tem o mesmo TipoUsuario do usuario autenticado
+            var usuario = await _context.Usuarios
+                .FirstOrDefaultAsync(u => u.AppUserId == Guid.Parse(userId));
+
+            // Retornar a lista com os usuarios que tem o mesmo TipoUsuario do usuario autenticado
+            var usuarios = await _context.Usuarios
+                .Where(u => u.TipoUsuario == usuario.TipoUsuario)
+                .ToListAsync();
+
+            return View(usuarios);
         }
 
         // GET: Usuarios/Details/5
@@ -85,17 +106,23 @@ namespace CadastroUsuario.Controllers
                 var identityUser = await _context.Users.FindAsync(userId);
                 usuario.IdentityUser = identityUser;
 
+                //// Criar um registro no AspNetUsersRoles com o Tipo de Usuário
+                //var role = new IdentityUserRole<string>
+                //{
+                //    UserId = userId,
+                //    RoleId = _context.Roles.Where(r => r.Name == usuario.TipoUsuario).First().Id // Defina o ID do papel desejado aqui
+                //};
+
+                // Adiciona a role ao usuário
+                await _userManager.AddToRoleAsync(identityUser, usuario.TipoUsuario);
+
+                // Atualiza o cookie de autenticação
+                await _signInManager.RefreshSignInAsync(identityUser);
+
                 usuario.UsuarioId = Guid.NewGuid();
                 _context.Add(usuario);
 
-
-                // Criar um registro no AspNetUsersRoles com o Tipo de Usuário
-                var role = new IdentityUserRole<string>
-                {
-                    UserId = userId,
-                    RoleId = _context.Roles.Where(r => r.Name == usuario.TipoUsuario).First().Id // Defina o ID do papel desejado aqui
-                };
-                _context.UserRoles.Add(role);
+                //_context.UserRoles.Add(role);
                 await _context.SaveChangesAsync();
 
                 return RedirectToAction("Index", "Home");
